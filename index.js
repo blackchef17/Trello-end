@@ -20,8 +20,8 @@ app.use(express.json());
 app.use(morgan('dev'))
 
 // Register user routes
-app.use("/api/users", userRoutes);
-
+// app.use("/api/users", userRoutes);
+app.use("/api", userRoutes);
 
 //Normal routes
 app.get('/', (req, res) => {

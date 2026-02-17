@@ -1,12 +1,7 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import crypto from 'crypto';
-import userschema from '../models/userschema.js';
-import User from '../models/userschema.js';
+import { forgotPasswordService, loginUserService, refreshAccessTokenService, registerUserService, resetPasswordService } from "../services/user-service.js";
 
-
-//Register User
-export const register = async (req, res, next) => {
+// Register User
+export const registerUserController = async (req, res, next) => {
     try{
         const {username, email, password} = req.body;
 
@@ -17,150 +12,78 @@ export const register = async (req, res, next) => {
             })
         }
 
-        //Check if user exist
-        const existingUser = await userschema.findOne({
-            $or: [{ email }, { username }]
-        })
-
-         if (existingUser) {
-             return res.status(400).json({
-             message: "User already exists"
-        });
-        }
-
-         //HASHING YOUR PASSWORD
-        const HashedPassword = await bcrypt.hash(password, 10);
-
-
-       //Create new user
-        const user = await userschema.create({
-            username,
-            email,
-            password: HashedPassword
-        })
-
-        //Create JWT Token
-        const token = jwt.sign(
-            {id: user.id, username: user.username},
-            process.env.JWT_SECRET,
-            {expiresIn: process.env.JWT_EXPIRES_IN || "1h"}
-        )
-
-        //Create Refresh Token
-        const refreshToken = jwt.sign(
-            {id: user._id},
-            process.env.REFRESH_TOKEN_SECRET,
-            {expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d"}
-        ) 
+        const output = await registerUserService(req.body);
 
         res.status(201).json({
-            message: "user registered successfully",
-            token,
-            refreshToken,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email
-            }
+            message: "user registered successfully. Please login",
+            status: 1,
+            data: result 
         })
     } catch (error) {
     next(error); // pass to centralized error handler
   }
 };
 
+
+// LOGIN USER
+export const loginUserController = async (req, res, next) => {
+    try {
+        const result = await loginUserService(req.body);
+
+            res.json({
+                message: "Login successful",
+                status: 1,
+                data: result
+            })
+
+    } catch(error) {
+        next(error)
+    }
+}
+
+
 //FORGOT PASSWORD
-export const forgotPassword = async (req, res) => {
+export const forgotPassword = async (req, res, next) => {
+    try {
     const {email} = req.body;
 
-    const user = await User.findOne({email});
+    const result = await forgotPasswordService(email);
 
-    if(!user) {
-        return res.json({
-            message: "if user exists, reset token sent"
-        });
+    res.json(result);
+    } catch (error){
+        next(error)
     }
-
-    // Create random token
-    const resetToken = crypto.randomBytes(32).toString("hex")
-
-    // Hash Token
-    const hashedToken = crypto
-    .createHash("sha256")
-    .update(resetToken)
-    .digest("hex");
-
-    // Save token to user
-    user.resetPasswordToken = hashedToken;
-    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
-
-    await user.save();
-
-    res.json({
-        message: "Reset token generated",
-        resetToken
-    })
 };
 
 
 // Reset Password
 export const resetPassword = async (req, res) => {
-    const {token, newPassword} = req.body;
+    try {
+        const {token, newPassword} = req.body;
 
-    // Hash incoming token
-    const hashedToken = crypto
-    .createHash("sha256")
-    .update(token)
-    .digest("hex");
+        const result = await resetPasswordService (token, newPassword)
 
-    //Find user
-    const user = await User.findOne({
-        resetPasswordToken: hashedToken,
-        resetPasswordExpires: {$gt: Date.now()}
-    });
-
-    if(!user) {
-        return res.status(400).json({
-            message: "Invalid or expired token"
-        });
+        res.json(result)
+    } catch(error) {
+        next(error)
     }
-
-    // Hash new password
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-
-    // Updated password
-    user.password = hashedPassword;
-
-    // Clear reset fields
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
-
-    await user.save();
-
-    res.json({
-        message: "password reset successful"
-    })
+    
 }
 
 
 //Refresh Access Token
-export const refreshAccessToken = (req, res) => {
-    const {token} = req.body;
-    if(!token) return res.status(401).json({message: "Token not provided"})
+export const refreshAccessToken = (req, res, next) => {
 
         try {
-            // verify refresh token and get the payload
-            const payload = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET)
+            const {token} = req.body;
+           
+             if(!token) {
+                return res.status(401).json({message: "Token not provided"})
+             } 
+             const result = refreshAccessTokenService(token)
 
-            // Generate a new access token
-            const accessToken = jwt.sign(
-                {id: payload.id},
-                process.env.REFRESH_TOKEN_SECRET,
-                {expiresIn: process.env.JWT_EXPIRES_IN || "1h"}
-            );
-
-            res.json({accessToken});
-
-        } catch (err) {
-            res.status(403).json({message: "Invalid or Expired Token"})
+            res.json({result});
+        } catch (error) {
+           next(error)
         }
-}
+    };
