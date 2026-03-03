@@ -8,16 +8,19 @@ export const registerUserController = async (req, res, next) => {
         //Check if all field are inputted
         if(!username || !email || !password) {
             return res.status(400).json({
-                message: "All fields are required"
+                message: "All fields are required",
+                status: 0,
+                data: null
             })
         }
 
-        const output = await registerUserService(req.body);
+        
+        const output = await registerUserService({username, email, password});
 
         res.status(201).json({
             message: "user registered successfully. Please login",
             status: 1,
-            data: result 
+            data: output 
         })
     } catch (error) {
     next(error); // pass to centralized error handler
@@ -28,6 +31,17 @@ export const registerUserController = async (req, res, next) => {
 // LOGIN USER
 export const loginUserController = async (req, res, next) => {
     try {
+         const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        message: "Email and password are required",
+        status: 0,
+        data: null
+      });
+    }
+
+        //
         const result = await loginUserService(req.body);
 
             res.json({
@@ -47,9 +61,21 @@ export const forgotPassword = async (req, res, next) => {
     try {
     const {email} = req.body;
 
+    if(!email) {
+        return res.status(400).json({
+            message: "Email is required",
+            status: 0,
+            data: null
+        })
+    }
+
     const result = await forgotPasswordService(email);
 
-    res.json(result);
+    res.json({
+                message: "Forgot Password",
+                status: 1,
+                data: result
+            })
     } catch (error){
         next(error)
     }
@@ -57,13 +83,25 @@ export const forgotPassword = async (req, res, next) => {
 
 
 // Reset Password
-export const resetPassword = async (req, res) => {
+export const resetPassword = async (req, res, next) => {
     try {
         const {token, newPassword} = req.body;
 
+        if(!token || !newPassword) {
+            return res.status(400).json({
+            message: "Token and new password are required",
+            status: 0,
+            data: null
+        })
+        }
+
         const result = await resetPasswordService (token, newPassword)
 
-        res.json(result)
+        res.json({
+                message: "Reset Password Successful",
+                status: 1,
+                data: result
+            })
     } catch(error) {
         next(error)
     }
@@ -72,7 +110,7 @@ export const resetPassword = async (req, res) => {
 
 
 //Refresh Access Token
-export const refreshAccessToken = (req, res, next) => {
+export const refreshAccessToken = async (req, res, next) => {
 
         try {
             const {token} = req.body;
@@ -80,9 +118,13 @@ export const refreshAccessToken = (req, res, next) => {
              if(!token) {
                 return res.status(401).json({message: "Token not provided"})
              } 
-             const result = refreshAccessTokenService(token)
+             const result = await refreshAccessTokenService(token)
 
-            res.json({result});
+           res.json({
+                message: "Refresh Token successful",
+                status: 1,
+                data: result
+            })
         } catch (error) {
            next(error)
         }

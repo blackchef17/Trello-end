@@ -1,4 +1,7 @@
 import User from '../models/userschema.js';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import crypto from "crypto";
 // import userschema from '../models/userschema.js';
 
 
@@ -7,7 +10,7 @@ export const registerUserService = async (userData) => {
       const {username, email, password} = userData;
 
       //Check if user exist
-      const existingUser = await userschema.findOne({
+      const existingUser = await User.findOne({
           $or: [{ email }, { username }]
       })
 
@@ -16,22 +19,22 @@ export const registerUserService = async (userData) => {
       }
 
        //HASHING YOUR PASSWORD
-      const HashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 10);
 
 
      //Create new user
-      const user = await userschema.create({
+      const newUser = await User.create({
           username,
           email,
-          password: HashedPassword
+          password: hashedPassword
       })
 
 
       // Return Only User Info (Nothing else)
       return {
-              id: user._id,
-              username: user.username,
-              email: user.email
+              id: newUser._id,
+              username: newUser.username,
+              email: newUser.email
         }
     };
 
@@ -52,6 +55,13 @@ export const registerUserService = async (userData) => {
         if(!isMatch) {
             throw new Error("Invalid credentials")
         }
+
+        // Create access token
+         const accessToken = jwt.sign(
+        { id: user._id },
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
+        );
 
          //Create Refresh Token
       const refreshToken = jwt.sign(
@@ -78,7 +88,7 @@ export const registerUserService = async (userData) => {
         const user = await User.findOne({ email });
 
          if(!user) {
-        return res.json({
+        return ({
             message: "if user exists, reset token sent"
         });
     }
@@ -98,7 +108,7 @@ export const registerUserService = async (userData) => {
 
     await user.save();
 
-    res.json({
+    return ({
         message: "Reset token generated",
         resetToken
     })
@@ -140,7 +150,7 @@ export const registerUserService = async (userData) => {
         return ({
             message: "password reset successful"
         })
-    }
+    };
 
 
     //REFRESH ACCESS TOKEN
@@ -152,7 +162,8 @@ export const registerUserService = async (userData) => {
             // Generate a new access token
          const accessToken = jwt.sign(
                 {id: payload.id},
-                process.env.REFRESH_TOKEN_SECRET,
+                process.env.ACCESS_TOKEN_SECRET,
                 {expiresIn: process.env.JWT_EXPIRES_IN || "1h"}
             );
+            return { accessToken }
     }
