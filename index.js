@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 dotenv.config();
 
+
+
 import express from 'express';
 const app = express();
 
@@ -8,6 +10,7 @@ import morgan from 'morgan';
 import './src/db/config.js';
 
 import userRoutes from "./src/routes/user-routes.js";
+import teamRoutes from "./src/routes/teamRoutes.js";
 
 
 const PORT = process.env.PORT || 3000;
@@ -22,6 +25,7 @@ app.use(morgan('dev'))
 // Register user routes
 // app.use("/api/users", userRoutes);
 app.use("/api", userRoutes);
+app.use("/api/teams", teamRoutes);
 
 //Normal routes
 app.get('/', (req, res) => {

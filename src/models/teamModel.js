@@ -5,27 +5,32 @@ const teamSchema = new mongoose.Schema({
         type: String,
         required: true,
         trim: true
-
     },
 
     description: {
-        type: string
+        type: String
     },
 
     owner: {
-        type: mongoose.Schema.type.objectId,
-        ref: "user",
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
         required: true
     }, 
 
     members: [
-    {
-        type: mongoose.Schema.type.objectId,
-        ref: "user"
+        {
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User"
+    },
+    role: {
+        type: String,
+        enum: ["admin", "manager", "member"],
+        default: "member"
     }
+}
 ]
 },
- {timestamps: true}
-);
+ {timestamps: true});
 
 export default mongoose.model("Team", teamSchema)

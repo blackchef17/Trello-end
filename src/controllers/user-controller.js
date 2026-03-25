@@ -42,7 +42,7 @@ export const loginUserController = async (req, res, next) => {
     }
 
         //
-        const result = await loginUserService(req.body);
+        const result = await loginUserService(email, password);
 
             res.json({
                 message: "Login successful",
@@ -129,3 +129,4 @@ export const refreshAccessToken = async (req, res, next) => {
            next(error)
         }
     };
+
