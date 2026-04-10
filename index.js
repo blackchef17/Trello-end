@@ -24,8 +24,8 @@ app.use(morgan('dev'))
 
 // Register user routes
 // app.use("/api/users", userRoutes);
-app.use("/api", userRoutes);
-app.use("/api/teams", teamRoutes);
+app.use("/api/users", userRoutes);
+// app.use("/api/users/teams", teamRoutes);
 
 //Normal routes
 app.get('/', (req, res) => {

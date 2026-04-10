@@ -91,7 +91,7 @@ export const inviteUserToTeamService = async (teamId, email) => {
 
     const inviteToken = crypto.randomBytes(20).toString("hex");
 
-    const inviteLink =  `http://localhost:3000/api/teams/join?token=${inviteToken}&teamId=${teamId}`;
+    const inviteLink =  `${process.env.BASE_URL}/api/teams/join?token=${inviteToken}&teamId=${teamId}`;
 
     await sendInviteEmail(email, inviteLink);
 

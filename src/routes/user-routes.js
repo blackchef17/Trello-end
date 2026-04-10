@@ -1,11 +1,21 @@
 import { Router } from "express";
-import { registerUserController, refreshAccessToken, forgotPassword, resetPassword, loginUserController } from "../controllers/user-controller.js";
+import { authenticate } from "../middlewares/authMiddleware.js";
+import userTeamRoutes from "./teamRoutes.js";
+import {
+  registerUserController,
+  refreshAccessToken,
+  forgotPassword,
+  resetPassword,
+  loginUserController,
+} from "../controllers/user-controller.js";
 
-const router = Router();
+const userRouter = Router();
 
-router.post("/register", registerUserController);
-router.post("/login", loginUserController)
-router.post("/refresh", refreshAccessToken);
-router.post("/forgot-password", forgotPassword);
-router.post("/reset-password", resetPassword);
-export default router;
+userRouter.post("/register", registerUserController);
+userRouter.post("/login", loginUserController);
+userRouter.post("/refresh", authenticate, refreshAccessToken);
+userRouter.post("/forgot-password", forgotPassword);
+userRouter.post("/reset-password", resetPassword);
+
+userRouter.use("/teams", authenticate, userTeamRoutes);
+export default userRouter;

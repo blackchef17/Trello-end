@@ -1,4 +1,5 @@
 import Team from "../models/teamModel.js";
+import { addMemberToTeamController } from "../controllers/teamController.js";
 
 export const authorizeRole = (...allowedRoles) => {
     return async (req, res, next) => {

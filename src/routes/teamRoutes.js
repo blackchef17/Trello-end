@@ -3,30 +3,30 @@ import express from "express";
 import { createTeamController, getMyTeamsController, addMemberToTeamController, inviteUserController, updateMemberRoleController } from "../controllers/teamController.js"
 import { authorizeRole } from "../middlewares/authorizeRole.js";
 
-const router = express.Router();
+const userRouter = express.Router();
 
 
 //POST CREATE TEAM
-router.post("/", createTeamController);
+userRouter.post("/", createTeamController);
 
 
 //GET GET MY TEAMS
-router.get("/", getMyTeamsController);
+userRouter.get("/", getMyTeamsController);
 
 
 //POST /api/teams/:teamId/members ADD MEMBERS
-router.post("/:teamId/members", addMemberToTeamController);
+userRouter.post("/:teamId/members", addMemberToTeamController);
 
 // EMAIL INVITE
-router.post("/:teamId/invite", inviteUserController)
+userRouter.post("/:teamId/invite", inviteUserController)
 
 // UPDATE ROLE
-router.patch("/:teamId/role", updateMemberRoleController);
+userRouter.patch("/:teamId/role", updateMemberRoleController);
 
 // ONLY ADMIN CAN UPDATE ROLES
-router.patch("/teams/:teamId/role", authorizeRole("admin"), updateMemberRoleController);
+userRouter.patch("/:teamId/role", authorizeRole("admin"), updateMemberRoleController);
 
 //ADMIN AND MANAGER CAN ADD MEMBER
-router.post("/teams/:teamId/add-member", authorizeRole("admin", "manager"),addMemberToTeamController )
+userRouter.post("/:teamId/add-member", authorizeRole("admin", "manager"),addMemberToTeamController )
 
-export default router;
+export default userRouter;
