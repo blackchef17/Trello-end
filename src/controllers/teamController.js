@@ -35,7 +35,10 @@ export const createTeamController = async (req, res, next) => {
 // GET MT TEAMS
 export const getMyTeamsController = async (req, res, next) => {
     try {
-        const result = await getMyTeamServices(req.user.id);
+
+        const userId = req.user.id
+        
+        const result = await getMyTeamServices(userId);
 
         res.json({
             message: "Teams fetched successfully",

@@ -24,8 +24,8 @@ export const createTeamServices = async ({name, description, ownerId}) => {
 export const getMyTeamServices = async (userId) => {
 
     const teams = await Team.find({
-        members: userId
-    }).populate("owner members", "username email");
+        "members.user": userId
+    }).populate("owner members.user", "username email");
 
     return teams;
 };
