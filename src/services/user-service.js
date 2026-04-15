@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { sendPasswordResetEmail } from "./email-service.js";
+import {generateAccessToken, generateRefreshToken, verifyRefreshToken} from "../utils/utilsToken.js"
 // import userschema from '../models/userschema.js';
 
 //REGISTER USER
@@ -52,19 +53,8 @@ export const loginUserService = async ({ email, password }) => {
     throw new Error("Invalid credentials");
   }
 
-  // Create access token
-  const accessToken = jwt.sign(
-    { id: user._id },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || "1h" },
-  );
-
-  //Create Refresh Token
-  const refreshToken = jwt.sign(
-    { id: user._id },
-    process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: process.env.REFRESH_TOKEN_EXPIRES_IN || "7d" },
-  );
+const accessToken = generateAccessToken(user);
+const refreshToken = generateRefreshToken(user);
 
   //Return tokens and user info
   return {
@@ -103,13 +93,13 @@ export const forgotPasswordService = async (email) => {
   await user.save();
 
   // Create reset password link
-  const link = "http://localhost:3000/users/reset-password/" + hashedToken;
+  const link = `${process.env.BASE_URL}/users/reset-password/${resetToken}`;
 
   // send link to email
-  sendPasswordResetEmail(email, link);
+ await sendPasswordResetEmail(email, link);
 
   return {
-    message: "Reset token generated",
+    message: "If user exists, reset link sent"
     // resetToken,
   };
 };
@@ -148,15 +138,11 @@ export const resetPasswordService = async (token, newPassword) => {
 };
 
 //REFRESH ACCESS TOKEN
-export const refreshAccessTokenService = async (token) => {
+export const refreshAccessTokenService = async (refreshToken) => {
   // verify refresh token and get the payload
-  const payload = jwt.verify(token, process.env.REFRESH_TOKEN_SECRET);
+  const payload = verifyRefreshToken(refreshToken);
 
-  // Generate a new access token
-  const accessToken = jwt.sign(
-    { id: payload.id },
-    process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: process.env.JWT_EXPIRES_IN || "1h" },
-  );
+  // Generate a new access token using utils
+  const accessToken = generateAccessToken({id: payload.id})
   return { accessToken };
 };

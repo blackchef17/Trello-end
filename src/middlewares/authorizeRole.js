@@ -26,7 +26,7 @@ export const authorizeRole = (...allowedRoles) => {
                 })
             }
 
-            if(!allowedRoles.includes(addMemberToTeamController.role)) {
+            if(!allowedRoles.includes(res.locals.user.role)) {
                 return res.status(403).json({
                     message: "Access denied"
                 })

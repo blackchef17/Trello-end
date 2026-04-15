@@ -14,10 +14,10 @@ export const authenticate = (req, res, next) => {
 
         const decodedToken = jwt.verify(verifyToken, process.env.ACCESS_TOKEN_SECRET)
 
-        req.user = decodedToken;
+        res.locals.user = decodedToken;
 
         next()
     } catch {
         return res.status(401).json({message: "Invalid Token"});
     }
-}
+};
