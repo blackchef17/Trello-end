@@ -16,9 +16,9 @@ export const authorizeRole = (...allowedRoles) => {
                 })
             }
 
-            const member = team.members.find(
-                m => m.user && m.user.equals(userId)
-            );
+            // const member = team.members.find(
+            //     m => m.user && m.user.equals(userId)
+            // );
 
             if(!member) {
                 return res.status(403).json({

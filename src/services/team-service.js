@@ -1,101 +1,103 @@
 import Team from "../models/teamModel.js";
 import crypto from "crypto";
 import { sendInviteEmail } from "./email-service.js";
+import { ROLES } from "../constants/role-constants.js";
 
 //CREATE NEW TEAM
-export const createTeamServices = async ({name, description, ownerId}) => {
-
-    const team = await Team.create({
-        name,
-        description,
-        owner: ownerId,
-        members: [
-            {
-                user: ownerId,
-                role: "admin"
-            }
-        ]
-    });
-    return team;
+export const createTeamServices = async ({ name, description, ownerId }) => {
+  const team = await Team.create({
+    name,
+    description,
+    owner: ownerId,
+    members: [
+      {
+        user: ownerId,
+        role: "admin",
+      },
+    ],
+  });
+  return team;
 };
-
 
 //GET MY TEAMS
 export const getMyTeamServices = async (userId) => {
+  const teams = await Team.find({
+    "members.user": userId,
+  }).populate("owner members.user", "username email");
 
-    const teams = await Team.find({
-        "members.user": userId
-    }).populate("owner members.user", "username email");
-
-    return teams;
+  return teams;
 };
-
 
 // ADD MEMBERS TO TEAM
 export const addTeamMemberToTeamService = async (teamId, userId) => {
+  const team = await Team.findById(teamId);
 
-    const team = await Team.findById(teamId)
+  if (!team) {
+    throw new Error("Team not found");
+  }
 
-    if(!team) {
-        throw new Error ("Team not found")
-    }
+  const alreadyMember = team.members.find(
+    (member) => member.user.toString() === userId,
+  );
 
-    const alreadyMember = team.members.find(
-        member => member.user.toString() === userId
-    )
+  // PREVENT DUPLICATE MEMBERS
+  if (alreadyMember) {
+    throw new Error("user already in team");
+  }
 
-    // PREVENT DUPLICATE MEMBERS
-    if(alreadyMember){
-        throw new Error ("user already in team")
-    }
+  team.members.push({
+    user: userId,
+    role: "member",
+  });
 
-    team.members.push({
-        user: userId,
-        role: "member"
-    });
+  await team.save();
 
-    await team.save();
-
-    return team;
-}
-
-
+  return team;
+};
 
 // CREATE API TO CHANGE ROLES
-export const updateMemberRoleService = async (teamId, userId, role) => {
-    
-    const team = await Team.findById(teamId);
+export const updateMemberRoleService = async (
+  ownerId,
+  teamId,
+  userId,
+  role,
+) => {
+  const team = await Team.findById(teamId);
 
-     // 👇 ADD DEBUG LOGS HERE
-    console.log("Team members:", team.members);
-    console.log("UserId:", userId);
+  const ownerRole = team.members.find((m) => m.user.equals(ownerId))?.role;
 
-      const member = team.members.find(
-        m => m.user?.toString() === userId
+  if (ownerRole != ROLES.ADMIN) {
+    throw new Error(
+      "Access denied!. You do not have the permission to do this action",
     );
+  }
 
-     if(!member) {
-        throw new Error("Member not found");
-    }
+  // 👇 ADD DEBUG LOGS HERE
+  console.log("Team members:", team.members);
+  console.log("UserId:", userId);
 
-    member.role = role;
+  const member = team.members.find((m) => m.user?.toString() === userId);
 
-    await team.save();
+  if (!member) {
+    throw new Error("Member not found");
+  }
 
-    return team;
-}
+  member.role = role;
 
+  await team.save();
+
+  return team;
+};
 
 // INVITE EMAIL
 export const inviteUserToTeamService = async (teamId, email) => {
+  const inviteToken = crypto.randomBytes(20).toString("hex");
 
-    const inviteToken = crypto.randomBytes(20).toString("hex");
+  const inviteLink = `${process.env.BASE_URL}/api/teams/join?token=${inviteToken}&teamId=${teamId}`;
 
-    const inviteLink =  `${process.env.BASE_URL}/api/teams/join?token=${inviteToken}&teamId=${teamId}`;
+  await sendInviteEmail(email, inviteLink);
 
-    await sendInviteEmail(email, inviteLink);
-
-    return {
-        message: "Invitation sent successfully"
-    };
+  return {
+    message: "Invitation sent successfully",
+  };
 };

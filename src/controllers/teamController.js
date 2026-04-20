@@ -86,7 +86,7 @@ export const addMemberToTeamController = async (req, res, next) => {
 export const updateMemberRoleController = async (req, res, next) => {
 
     try {
-
+        const ownerId = res.locals.user.id
         const {teamId} = req.params;
         const {userId, role} = req.body;
 
@@ -96,7 +96,7 @@ export const updateMemberRoleController = async (req, res, next) => {
             })
         }
 
-        const result = await updateMemberRoleService(teamId, userId, role)
+        const result = await updateMemberRoleService(ownerId, teamId, userId, role)
 
         res.json({
             message: "Role updated successfully",

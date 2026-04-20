@@ -1,9 +1,12 @@
 import User from "../models/userschema.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import { sendPasswordResetEmail } from "./email-service.js";
-import {generateAccessToken, generateRefreshToken, verifyRefreshToken} from "../utils/utilsToken.js"
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../utils/utilsToken.js";
 // import userschema from '../models/userschema.js';
 
 //REGISTER USER
@@ -53,8 +56,8 @@ export const loginUserService = async ({ email, password }) => {
     throw new Error("Invalid credentials");
   }
 
-const accessToken = generateAccessToken(user);
-const refreshToken = generateRefreshToken(user);
+  const accessToken = generateAccessToken({ id: user._id });
+  const refreshToken = generateRefreshToken(user);
 
   //Return tokens and user info
   return {
@@ -96,10 +99,10 @@ export const forgotPasswordService = async (email) => {
   const link = `${process.env.BASE_URL}/users/reset-password/${resetToken}`;
 
   // send link to email
- await sendPasswordResetEmail(email, link);
+  await sendPasswordResetEmail(email, link);
 
   return {
-    message: "If user exists, reset link sent"
+    message: "If user exists, reset link sent",
     // resetToken,
   };
 };
@@ -143,6 +146,6 @@ export const refreshAccessTokenService = async (refreshToken) => {
   const payload = verifyRefreshToken(refreshToken);
 
   // Generate a new access token using utils
-  const accessToken = generateAccessToken({id: payload.id})
+  const accessToken = generateAccessToken({ id: payload.id });
   return { accessToken };
 };

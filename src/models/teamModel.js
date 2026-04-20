@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { ROLES } from "../constants/role-constants.js";
 
 const teamSchema = new mongoose.Schema({
     name: {
@@ -25,7 +26,7 @@ const teamSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["admin", "manager", "member"],
+        enum: [ROLES.ADMIN, "manager", "member"],
         default: "member"
     }
 }

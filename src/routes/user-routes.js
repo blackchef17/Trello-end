@@ -13,7 +13,7 @@ const userRouter = Router();
 
 userRouter.post("/register", registerUserController);
 userRouter.post("/login", loginUserController);
-userRouter.post("/refresh", authenticate, refreshAccessToken);
+userRouter.post("/refresh", refreshAccessToken);
 userRouter.post("/forgot-password", forgotPassword);
 userRouter.post("/reset-password", resetPassword);
 
