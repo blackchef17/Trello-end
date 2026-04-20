@@ -1,6 +1,7 @@
 import express from "express";
 import { createTeamController, getMyTeamsController, addMemberToTeamController, inviteUserController, updateMemberRoleController } from "../controllers/teamController.js"
 import { authorizeRole } from "../middlewares/authorizeRole.js";
+import { ROLES } from "../constants/role-constants.js"
 
 const userTeamRoutes = express.Router();
 
@@ -26,6 +27,6 @@ userTeamRoutes.post("/:teamId/invite", inviteUserController)
 userTeamRoutes.patch("/:teamId/role", updateMemberRoleController);
 
 //ADMIN AND MANAGER CAN ADD MEMBER
-userTeamRoutes.post("/:teamId/add-member", authorizeRole("admin", "manager"),addMemberToTeamController )
+userTeamRoutes.post("/:teamId/add-member", authorizeRole(ROLES.ADMIN, ROLES.MANAGER),addMemberToTeamController )
 
 export default userTeamRoutes;
