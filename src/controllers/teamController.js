@@ -59,10 +59,10 @@ export const addMemberToTeamController = async (req, res, next) => {
 
         const {teamId} = req.params;
 
-        const requesterId = res.locals.user;
+        const requesterId = res.locals.user.id;
         const newUserId = req.body.userId;
 
-        if (!userId) {
+        if (!newUserId) {
             return res.status(400).json({
                 message: "User ID is required",
                 status: 0,
