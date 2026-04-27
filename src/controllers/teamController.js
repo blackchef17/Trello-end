@@ -5,7 +5,8 @@ import { createTeamServices, getMyTeamServices, addTeamMemberToTeamService, invi
 export const createTeamController = async (req, res, next) => {
     try {
 
-        const {name, description, ownerId} = req.body;
+        const {name, description} = req.body;
+        const ownerId = res.locals.user;
 
         if (!name) {
             return res.status(400).json({
@@ -57,7 +58,9 @@ export const addMemberToTeamController = async (req, res, next) => {
     try {
 
         const {teamId} = req.params;
-        const userId = res.locals.user;
+
+        const requesterId = res.locals.user;
+        const newUserId = req.body.userId;
 
         if (!userId) {
             return res.status(400).json({
@@ -67,7 +70,10 @@ export const addMemberToTeamController = async (req, res, next) => {
             })
         }
 
-        const result = await addTeamMemberToTeamService(teamId, userId);
+        const result = await addTeamMemberToTeamService(
+            teamId, 
+            requesterId,
+            newUserId );
 
         res.json({
             message: "Member added successfully",

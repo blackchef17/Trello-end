@@ -29,18 +29,33 @@ export const getMyTeamServices = async (userId) => {
 };
 
 // ADD MEMBERS TO TEAM
-export const addTeamMemberToTeamService = async (teamId, userId) => {
+export const addTeamMemberToTeamService = async (teamId, requesterId, userId) => {
   const team = await Team.findById(teamId);
 
   if (!team) {
     throw new Error("Team not found");
   }
 
+   // Find the requester inside the team
+  const requester = team.members.find(
+    (m) => m.user.toString() === requesterId
+  );
+
+  // Ensure requester is part of the team
+  if(!requester) {
+    throw new Error("Not a team member")
+  }
+
+   // Enforce role-based permission (middleware logic)
+  if (![ROLES.ADMIN, ROLES.MANAGER].includes(requester.role)) {
+    throw new Error("Access denied");
+  }
+
+  // PREVENT DUPLICATE MEMBERS
   const alreadyMember = team.members.find(
     (member) => member.user.toString() === userId,
   );
 
-  // PREVENT DUPLICATE MEMBERS
   if (alreadyMember) {
     throw new Error("user already in team");
   }
