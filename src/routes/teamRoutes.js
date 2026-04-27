@@ -25,7 +25,7 @@ userTeamRoutes.post("/:teamId/invite", inviteUserController)
 // userRouter.patch("/:teamId/role", updateMemberRoleController);
 
 // ONLY ADMIN CAN UPDATE ROLES
-userTeamRoutes.patch("/:teamId/role", requireTeamAuth, updateMemberRoleController);
+userTeamRoutes.patch("/:teamId/role", updateMemberRoleController);
 
 //ADMIN AND MANAGER CAN ADD MEMBER
 userTeamRoutes.post("/:teamId/add-member", addMemberToTeamController )
