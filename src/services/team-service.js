@@ -62,7 +62,7 @@ export const addTeamMemberToTeamService = async (teamId, requesterId, userId) =>
 
   team.members.push({
     user: userId,
-    role: "member",
+    role: "ROLES.member",
   });
 
   await team.save();

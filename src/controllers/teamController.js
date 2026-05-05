@@ -52,7 +52,7 @@ export const getMyTeamsController = async (req, res, next) => {
 };
 
 
-// ADD MEMBER
+// ADD MEMBER TO TEAM
 export const addMemberToTeamController = async (req, res, next) => {
 
     try {
