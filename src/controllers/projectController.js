@@ -54,3 +54,42 @@ export const getSingleProjectController = (req, res, next) => {
         next(error)
     }
 }
+
+
+// UPDATE PROJECT
+export const updateProjectController = (req, res, next) => {
+
+    try{
+        const{projectId} = req.params;
+        const userId = res.locals.user.id;
+
+        const project = await updateProjectService(projectId, userId);
+
+        res.json({
+            message: "project updated successfully",
+            data: project
+        })
+    } catch(error){
+        next(error)
+    }
+}
+
+// DELETE PROJECT
+export const deleteProjectController = (req, res, next) => {
+
+    try{
+        const{projectId} = req.params;
+        const userId = res.locals.user.id;
+
+        const project = await deleteProjectService(projectId, userId);
+
+        res.json({
+            message: "project deleted successfully",
+            data: project
+        })
+        } catch(error){
+        next(error)
+        }
+
+    }
+}
