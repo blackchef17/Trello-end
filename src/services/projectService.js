@@ -1,6 +1,9 @@
 // CREATE PROJECT
-import { ROLES } from "../constants/role-constants";
-import { checkTeamPermission } from "../utils/teamPermission";
+import Project from "../models/projectSchema.js"
+import { ROLES } from "../constants/role-constants.js";
+import { checkTeamPermission } from "../utils/teamPermission.js";
+import { checkProjectPermission } from "../utils/projectPermission.js";
+
 
 export const createProjectService = async ({name, teamId, userId}) => {
 
@@ -8,7 +11,7 @@ export const createProjectService = async ({name, teamId, userId}) => {
     await checkTeamPermission(teamId, userId, [ROLES.ADMIN, ROLES.MANAGER]);
 
     // Check if the project exist in the same team
-    const existingProject = await project.findOne({
+    const existingProject = await Project.findOne({
         name: name.trim(),
         team: teamId
     })
@@ -19,12 +22,10 @@ export const createProjectService = async ({name, teamId, userId}) => {
 
 
     return await project.create({
-        name,
+        name: name.trim(),
         team: teamId,
         createdBy: userId
     });
-
-    if()
 };
 
 
@@ -33,35 +34,27 @@ export const getProjectServices = async ({teamId, userId}) => {
 
     await checkTeamPermission(teamId, userId);
 
-    return await project.find({Team: teamId})
+    return project.find({team: teamId})
 };
 
 
 // GET SINGLE PROJECT
 export const getSingleProjectServices = async ({projectId, userId}) => {
 
-    const project = await project.findById(projectId)
+    const project = await checkProjectPermission(projectId)
 
-    if(!project){
-        throw new Error ("Project not found")
-    }
-
-    await checkTeamPermission(projectId, userId);
+    await checkTeamPermission(project.team, userId);
 
     return project;
 };
 
 
 // UPDATE PROJECT
-export const updateProjectService = async ({projectId, userId}) => {
+export const updateProjectService = async ({projectId, userId, data}) => {
 
-    const project = await project.findById(projectId)
+    const project = await checkProjectPermission(projectId)
 
-    if(!project){
-        throw new Error ("Project not found")
-    }
-
-    await checkTeamPermission(projectId, userId, [ROLES.ADMIN, ROLES.MANAGER])
+    await checkTeamPermission(project.team, userId, [ROLES.ADMIN, ROLES.MANAGER])
 
     Object.assign(project, data)
 
@@ -69,15 +62,15 @@ export const updateProjectService = async ({projectId, userId}) => {
 
     return project;
 
-}
+};
 
 
 // DELETE PROJECT
 export const deleteProjectService = async ({projectId, userId}) => {
 
-    const project = await project.findById(projectId)
+    const project = await checkProjectPermission(projectId)
 
-    await checkTeamPermission(projectId, userId, [ROLES.ADMIN])
+    await checkTeamPermission(project.team, userId, [ROLES.ADMIN])
 
     await project.deleteOne()
 
