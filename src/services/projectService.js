@@ -21,7 +21,7 @@ export const createProjectService = async ({name, teamId, userId}) => {
     }
 
 
-    return await project.create({
+    return await Project.create({
         name: name.trim(),
         team: teamId,
         createdBy: userId
@@ -30,7 +30,7 @@ export const createProjectService = async ({name, teamId, userId}) => {
 
 
 // GET ALL PROJECT
-export const getProjectServices = async ({teamId, userId}) => {
+export const getProjectService = async ({teamId, userId}) => {
 
     await checkTeamPermission(teamId, userId);
 
@@ -39,7 +39,7 @@ export const getProjectServices = async ({teamId, userId}) => {
 
 
 // GET SINGLE PROJECT
-export const getSingleProjectServices = async ({projectId, userId}) => {
+export const getSingleProjectService = async ({projectId, userId}) => {
 
     const project = await checkProjectPermission(projectId)
 

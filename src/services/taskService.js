@@ -3,6 +3,7 @@ import Task from "../models/taskSchema.js";
 import {ROLES} from "../constants/role-constants.js";
 import { checkTeamPermission } from "../utils/teamPermission.js";
 import { checkTaskPermission } from "../utils/TaskPermission.js";
+import { checkProjectPermission } from "../utils/projectPermission.js";
 
 
 // CREATE TASKS
@@ -15,9 +16,9 @@ export const createTaskService = async ({title, projectId, userId}) => {
     await checkTeamPermission(project.team, userId);
 
 
-    return await project.createdAt({
+    return await Task.create({
+        projectId,
         title: title.trim(),
-        project: projectId,
         createdBy: userId
     })
 };

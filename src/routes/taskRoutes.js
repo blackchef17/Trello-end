@@ -1,6 +1,6 @@
 import express from "express";
-
-import { createTaskController, getTaskController, getSingleTaskController, updateTaskController, deleteTaskController, assignTaskController } from "../controllers/taskController.js";
+import { createTaskController, getTaskController, getSingleTaskController, updateTaskController, deleteTaskController } from "../controllers/taskController.js";
+import { assignTaskController } from "../controllers/assignTaskController.js";
 
 const taskRoutes = express.Router();
 
@@ -21,5 +21,6 @@ taskRoutes.delete("/:taskId", deleteTaskController)
 
 // ASSIGN TASK
 taskRoutes.patch("/:taskId/assign", assignTaskController);
+
 
 export default taskRoutes;

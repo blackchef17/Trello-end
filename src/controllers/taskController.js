@@ -1,6 +1,5 @@
-import req from "express/lib/request";
-import { createTaskService, getSingleTaskService, getTaskService, updateTaskService } from "../services/taskService";
-import res from "express/lib/response";
+import { createTaskService, getSingleTaskService, getTaskService, updateTaskService } from "../services/taskService.js";
+
 
 // CREATE TASKS
 export const createTaskController = async (req, res, next) => {
@@ -8,7 +7,7 @@ export const createTaskController = async (req, res, next) => {
     try {
         const {title} = req.body
         const {projectId} = req.params;
-        const userId = res.locals.user.id;
+        const userId = res.locals.userId;
 
         const task = await createTaskService({title, projectId, userId});
 
@@ -27,7 +26,7 @@ export const getTaskController = async (req, res, next) => {
 
     try {
         const {projectId} = req.params;
-        const userId = res.locals.user.id;
+        const userId = res.locals.userId;
 
         // GET filters from query
         const { status, priority } = req.query;
@@ -49,7 +48,7 @@ export const getSingleTaskController = async (req, res, next) => {
 
     try {
         const { taskId } = req.params;
-        const userId = res.locals.user.id;
+        const userId = res.locals.userId;
 
         const task = await getSingleTaskService({taskId, userId});
 
@@ -68,7 +67,7 @@ export const updateTaskController = async (req, res, next) => {
 
     try{
         const { taskId } = req.params;
-        const userId = res.locals.user.id;
+        const userId = res.locals.userId;
 
         const task = await updateTaskService(taskId, userId, data)
 
@@ -87,7 +86,7 @@ export const deleteTaskController = async (req, res, next) => {
 
     try{
         const { taskId } = req.params;
-        const userId = res.locals.user.id;
+        const userId = res.locals.userId;
 
         const taskResult = await deleteTaskService(taskId, userId)
 

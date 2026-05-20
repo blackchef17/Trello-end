@@ -1,8 +1,6 @@
-import Task from "../models/taskModel.js";
-import Project from "../models/projectModel.js";
+import Task from "../models/taskSchema.js";
+import Project from "../models/projectSchema.js";
 import { checkTeamPermission } from "../utils/teamPermission.js";
-import { findTaskOrFail } from "../utils/findTask.js";
-import { findProjectOrFail } from "../utils/findProject.js";
 import { ROLES } from "../constants/role-constants.js";
 import { checkTaskPermission } from "../utils/TaskPermission.js";
 

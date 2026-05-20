@@ -1,6 +1,6 @@
 import express from "express";
 import { createTeamController, getMyTeamsController, addMemberToTeamController, inviteUserController, updateMemberRoleController } from "../controllers/teamController.js"
-
+import projectRoutes from "./projectRoutes.js";
 
 const userTeamRoutes = express.Router();
 
@@ -26,6 +26,8 @@ userTeamRoutes.post("/:teamId/invite", inviteUserController)
 userTeamRoutes.patch("/:teamId/role", updateMemberRoleController);
 
 //ADMIN AND MANAGER CAN ADD MEMBER
-userTeamRoutes.post("/:teamId/add-member", addMemberToTeamController )
+userTeamRoutes.post("/:teamId/add-member", addMemberToTeamController);
+
+userTeamRoutes.use("/projects", projectRoutes);
 
 export default userTeamRoutes;

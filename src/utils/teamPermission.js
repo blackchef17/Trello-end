@@ -2,7 +2,7 @@ import { ROLES } from "../constants/role-constants.js"
 import Team from "../models/teamModel.js"
 
 
-export const checkTeamPermission = async (teamId, userId) => {
+export const checkTeamPermission = async (teamId, userId, allowedRoles = []) => {
     const team = await Team.findById(teamId)
 
     if(!team) {

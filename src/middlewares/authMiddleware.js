@@ -14,7 +14,7 @@ export const authenticate = (req, res, next) => {
 
         const decodedToken = jwt.verify(verifyToken, process.env.ACCESS_TOKEN_SECRET)
 
-        res.locals.user = decodedToken;
+        res.locals.userId = decodedToken.id;
 
         next()
     } catch {

@@ -42,11 +42,16 @@ export const registerUserService = async (userData) => {
 
 //LOGIN SPACE
 export const loginUserService = async ({ email, password }) => {
+
+  console.log("Incoming email:", email);
+
   //Find user by email
   const user = await User.findOne({ email });
 
+   console.log("Found user:", user);
+
   if (!user) {
-    throw new Error("Invalid credentials");
+    throw new Error("Invalid credential");
   }
 
   //Compare passwords
@@ -57,7 +62,8 @@ export const loginUserService = async ({ email, password }) => {
   }
 
   const accessToken = generateAccessToken({ id: user._id });
-  const refreshToken = generateRefreshToken(user);
+  const refreshToken = generateRefreshToken({ id: user._id });
+
 
   //Return tokens and user info
   return {

@@ -1,4 +1,3 @@
-// import { createDiffieHellmanGroup } from "crypto";
 import { createTeamServices, getMyTeamServices, addTeamMemberToTeamService, inviteUserToTeamService, updateMemberRoleService } from "../services/team-service.js"
 
 // Create New Team
@@ -6,7 +5,7 @@ export const createTeamController = async (req, res, next) => {
     try {
 
         const {name, description} = req.body;
-        const ownerId = res.locals.user;
+        const ownerId = res.locals.userId;
 
         if (!name) {
             return res.status(400).json({

@@ -6,7 +6,7 @@ export const createProjectController = async (req, res, next) => {
     try{
         const { name } = req.body;
         const { teamId } = req.params;
-        const userId = res.locals.user.id
+        const userId = res.locals.userId
 
         const project = await createProjectService({name, teamId, userId});
 
@@ -25,7 +25,7 @@ export const getProjectController = async (req, res, next) => {
 
     try{
         const {teamId} = req.params;
-        const userId = res.locals.user.id;
+        const userId = res.locals.userId;
 
         const projects = await getProjectService({teamId, userId});
 
@@ -44,7 +44,7 @@ export const getSingleProjectController = async (req, res, next) => {
 
     try{
         const {projectId} = req.params;
-        const userId = res.locals.user.id;
+        const userId = res.locals.userId;
 
         const project = await getSingleProjectService({projectId, userId})
 
@@ -63,7 +63,7 @@ export const updateProjectController = async (req, res, next) => {
 
     try{
         const{projectId} = req.params;
-        const userId = res.locals.user.id;
+        const userId = res.locals.userId;
 
         const project = await updateProjectService({projectId, userId});
 
@@ -81,7 +81,7 @@ export const deleteProjectController = async (req, res, next) => {
 
     try{
         const{projectId} = req.params;
-        const userId = res.locals.user.id;
+        const userId = res.locals.userId;
 
         const project = await deleteProjectService({projectId, userId});
 
