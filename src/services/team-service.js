@@ -30,16 +30,26 @@ export const getMyTeamServices = async (userId) => {
 
 // ADD MEMBERS TO TEAM
 export const addTeamMemberToTeamService = async (teamId, requesterId, userId) => {
+
   const team = await Team.findById(teamId);
 
   if (!team) {
     throw new Error("Team not found");
   }
 
+  console.log("Requester ID:", requesterId);
+console.log(
+  "Team Members:",
+  team.members.map(m => ({
+    user: m.user.toString(),
+    role: m.role
+  }))
+);
+
    // Find the requester inside the team
-  const requester = team.members.find(
-    (m) => m.user.toString() === requesterId
-  );
+ const requester = team.members.find(
+  (m) => String(m.user) === String(requesterId)
+);
 
   // Ensure requester is part of the team
   if(!requester) {
@@ -62,7 +72,7 @@ export const addTeamMemberToTeamService = async (teamId, requesterId, userId) =>
 
   team.members.push({
     user: userId,
-    role: "ROLES.member",
+    role: ROLES.MEMBER
   });
 
   await team.save();

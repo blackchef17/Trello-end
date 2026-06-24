@@ -9,14 +9,17 @@ const projectRoutes = express.Router();
 projectRoutes.use(authenticate)
 
 //POST CREATE PROJECT
-projectRoutes.post("/:teamId", createProjectController);
+projectRoutes.post("/", createProjectController);
 
 
 //GET GET ALL PROJECT
-projectRoutes.get("/:teamId", getProjectController)
+projectRoutes.get("/", getProjectController)
+
+//GET GET ALL TASKS USING THE PROJECT
+projectRoutes.use("/tasks", taskRoutes)
 
 // GET single project
-projectRoutes.get("/single/:projectId", getSingleProjectController)
+projectRoutes.get("/:projectId", getSingleProjectController)
 
 // UPDATE project
 projectRoutes.patch("/:projectId", updateProjectController)
@@ -24,6 +27,6 @@ projectRoutes.patch("/:projectId", updateProjectController)
 // DELETE project
 projectRoutes.delete("/:projectId", deleteProjectController)
 
-projectRoutes.use("/tasks", taskRoutes)
+
 
 export default projectRoutes;

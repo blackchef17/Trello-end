@@ -2,7 +2,6 @@
 import Project from "../models/projectSchema.js"
 import { ROLES } from "../constants/role-constants.js";
 import { checkTeamPermission } from "../utils/teamPermission.js";
-import { checkProjectPermission } from "../utils/projectPermission.js";
 
 
 export const createProjectService = async ({name, teamId, userId}) => {
@@ -16,6 +15,8 @@ export const createProjectService = async ({name, teamId, userId}) => {
         team: teamId
     })
 
+    console.log("TEAM ID RECEIVED:", teamId);
+    console.log("USER ID RECEIVED:",  userId);
     if(existingProject) {
         throw new Error ("Project with this name already exist")
     }
@@ -32,9 +33,14 @@ export const createProjectService = async ({name, teamId, userId}) => {
 // GET ALL PROJECT
 export const getProjectService = async ({teamId, userId}) => {
 
-    await checkTeamPermission(teamId, userId);
+    if(teamId) {
 
-    return project.find({team: teamId})
+        await checkTeamPermission(teamId, userId);
+
+        return Project.find({team: teamId})
+    }
+    
+    return Project.find({createdBy: userId})
 };
 
 
@@ -75,4 +81,21 @@ export const deleteProjectService = async ({projectId, userId}) => {
     await project.deleteOne()
 
     return project;
+}
+
+
+// Validation
+export const checkProjectPermission = async (projectId) => {
+
+    // Find project ID
+     const project = await Project.findById(projectId)
+    
+     // if project does not exist
+     if(!project){
+            throw new Error ("Project not found")
+     }
+
+     // return task
+     return project;
+    
 }

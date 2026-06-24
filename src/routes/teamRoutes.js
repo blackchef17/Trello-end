@@ -5,6 +5,7 @@ import projectRoutes from "./projectRoutes.js";
 const userTeamRoutes = express.Router();
 
 
+
 //POST CREATE TEAM
 userTeamRoutes.post("/", createTeamController);
 
@@ -26,7 +27,7 @@ userTeamRoutes.post("/:teamId/invite", inviteUserController)
 userTeamRoutes.patch("/:teamId/role", updateMemberRoleController);
 
 //ADMIN AND MANAGER CAN ADD MEMBER
-userTeamRoutes.post("/:teamId/add-member", addMemberToTeamController);
+// userTeamRoutes.post("/:teamId/add-member", addMemberToTeamController);
 
 userTeamRoutes.use("/projects", projectRoutes);
 

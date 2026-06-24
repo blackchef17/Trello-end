@@ -4,8 +4,8 @@ import { createProjectService, getProjectService, getSingleProjectService, updat
 export const createProjectController = async (req, res, next) => {
 
     try{
-        const { name } = req.body;
-        const { teamId } = req.params;
+        const { name, teamId } = req.body;
+        // const { teamId } = req.params;
         const userId = res.locals.userId
 
         const project = await createProjectService({name, teamId, userId});
@@ -41,7 +41,7 @@ export const getProjectController = async (req, res, next) => {
 
 // GET SINGLE PROJECT 
 export const getSingleProjectController = async (req, res, next) => {
-
+ console.log("SINGLE PROJECT CONTROLLER HIT");
     try{
         const {projectId} = req.params;
         const userId = res.locals.userId;
@@ -64,10 +64,11 @@ export const updateProjectController = async (req, res, next) => {
     try{
         const{projectId} = req.params;
         const userId = res.locals.userId;
+        const data = req.body;
 
-        const project = await updateProjectService({projectId, userId});
+        const project = await updateProjectService({projectId, userId, data});
 
-        res.json({
+        res.status(200).json({
             message: "project updated successfully",
             data: project
         })
@@ -82,12 +83,13 @@ export const deleteProjectController = async (req, res, next) => {
     try{
         const{projectId} = req.params;
         const userId = res.locals.userId;
+        // const data = req.body;
 
         const project = await deleteProjectService({projectId, userId});
 
         res.json({
             message: "project deleted successfully",
-            data: project
+            // data: project
         })
         } catch(error){
         next(error)

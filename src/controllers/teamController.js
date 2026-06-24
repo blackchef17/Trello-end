@@ -20,8 +20,8 @@ export const createTeamController = async (req, res, next) => {
             description,
             ownerId
         });
-
-        res.status(201).json({
+        
+        return res.status(201).json({
             message: "Team created successfully",
             status: 1,
             data: output
@@ -36,11 +36,11 @@ export const createTeamController = async (req, res, next) => {
 export const getMyTeamsController = async (req, res, next) => {
     try {
 
-        const userId = res.locals.user;
+        const userId = res.locals.userId;
         
         const result = await getMyTeamServices(userId);
 
-        res.json({
+       return res.status(200).json({
             message: "Teams fetched successfully",
             status: 1,
             data: result
@@ -57,8 +57,7 @@ export const addMemberToTeamController = async (req, res, next) => {
     try {
 
         const {teamId} = req.params;
-
-        const requesterId = res.locals.user.id;
+        const requesterId = res.locals.userId;
         const newUserId = req.body.userId;
 
         if (!newUserId) {
@@ -74,7 +73,7 @@ export const addMemberToTeamController = async (req, res, next) => {
             requesterId,
             newUserId );
 
-        res.json({
+       res.status(200).json({
             message: "Member added successfully",
             status: 1,
             data: result
@@ -91,7 +90,7 @@ export const addMemberToTeamController = async (req, res, next) => {
 export const updateMemberRoleController = async (req, res, next) => {
 
     try {
-        const ownerId = res.locals.user.id
+        const ownerId = res.locals.userId
         const {teamId} = req.params;
         const {userId, role} = req.body;
 
@@ -103,7 +102,7 @@ export const updateMemberRoleController = async (req, res, next) => {
 
         const result = await updateMemberRoleService(ownerId, teamId, userId, role)
 
-        res.json({
+        res.status(200).json({
             message: "Role updated successfully",
             status: 1,
             data: result
@@ -140,3 +139,4 @@ export const inviteUserController = async (req, res, next) => {
         next (error);
     } 
 }
+

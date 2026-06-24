@@ -1,12 +1,12 @@
-import { createTaskService, getSingleTaskService, getTaskService, updateTaskService } from "../services/taskService.js";
+import { createTaskService, getSingleTaskService, getTaskService, updateTaskService, assignTaskService } from "../services/taskService.js";
 
 
 // CREATE TASKS
 export const createTaskController = async (req, res, next) => {
 
     try {
-        const {title} = req.body
-        const {projectId} = req.params;
+        const {title, projectId} = req.body
+        // const {projectId} = req.params;
         const userId = res.locals.userId;
 
         const task = await createTaskService({title, projectId, userId});
@@ -25,13 +25,15 @@ export const createTaskController = async (req, res, next) => {
 export const getTaskController = async (req, res, next) => {
 
     try {
-        const {projectId} = req.params;
+        // const {projectId} = req.params;
         const userId = res.locals.userId;
 
         // GET filters from query
-        const { status, priority } = req.query;
+        const { projectId, status, priority } = req.query;
 
         const tasks = await getTaskService({projectId, userId, status, priority});
+
+        console.log("PROJECT ID:", projectId);
 
         res.status(201).json({
             message: "Tasks fetched",
@@ -68,11 +70,12 @@ export const updateTaskController = async (req, res, next) => {
     try{
         const { taskId } = req.params;
         const userId = res.locals.userId;
+        const data = req.body;
 
-        const task = await updateTaskService(taskId, userId, data)
+        const task = await updateTaskService({taskId, userId, data})
 
-        res.status(201).json({
-            message: "Tasks fetched",
+        res.status(200).json({
+            message: "Tasks updated successfully",
             data: task
         })
         } catch(error){
@@ -95,3 +98,31 @@ export const deleteTaskController = async (req, res, next) => {
          next(error);
          }
     };
+
+
+    //Assign Task
+    export const assignTaskController = async (req, res, next) => {
+
+    try {
+
+        const { taskId } = req.params;
+
+        const { assignedTo } = req.body;
+
+        const userId = res.locals.userId;
+
+        const task = await assignTaskService({
+            taskId,
+            assignedTo,
+            userId
+        });
+
+        res.json({
+            message: "Task assigned successfully",
+            data: task
+        });
+
+    } catch(error) {
+        next(error);
+    }
+}
