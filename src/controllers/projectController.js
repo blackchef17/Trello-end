@@ -1,98 +1,97 @@
-import { createProjectService, getProjectService, getSingleProjectService, updateProjectService, deleteProjectService } from "../services/projectService.js";
+import {
+  createProjectService,
+  getProjectService,
+  getSingleProjectService,
+  updateProjectService,
+  deleteProjectService,
+} from "../services/projectService.js";
 
 // CREATE PROJECT
 export const createProjectController = async (req, res, next) => {
+  try {
+    const { name, teamId } = req.body;
+    // const { teamId } = req.params;
+    const userId = res.locals.userId;
 
-    try{
-        const { name, teamId } = req.body;
-        // const { teamId } = req.params;
-        const userId = res.locals.userId
+    const project = await createProjectService({ name, teamId, userId });
 
-        const project = await createProjectService({name, teamId, userId});
-
-        res.status(201).json({
-            message: "Project Created",
-            data: project
-        })
-    } catch (error) {
-            next(error)
-    }
+    res.status(201).json({
+      message: "Project Created",
+      data: project,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
-
 
 // GET ALL PROJECT
 export const getProjectController = async (req, res, next) => {
+  try {
+    const { teamId } = req.params;
+    const userId = res.locals.userId;
 
-    try{
-        const {teamId} = req.params;
-        const userId = res.locals.userId;
+    const projects = await getProjectService({ teamId, userId });
 
-        const projects = await getProjectService({teamId, userId});
-
-        res.json({
-            message: "All Project Fetched",
-            data: projects
-        })
-    } catch(error) {
-        next(error)
-    }
+    res.json({
+      message: "All Project Fetched",
+      data: projects,
+    });
+  } catch (error) {
+    next(error);
+  }
 };
 
-
-// GET SINGLE PROJECT 
+// GET SINGLE PROJECT
 export const getSingleProjectController = async (req, res, next) => {
- console.log("SINGLE PROJECT CONTROLLER HIT");
-    try{
-        const {projectId} = req.params;
-        const userId = res.locals.userId;
+  try {
+    const { projectId } = req.params;
+    const userId = res.locals.userId;
 
-        const project = await getSingleProjectService({projectId, userId})
+    console.log("Get Project: ProjectId: " + projectId);
 
-        res.json({
-            message: "Single project fetched",
-            data: project
-        })
-    } catch(error){
-        next(error)
-    }
-}
+    const project = await getSingleProjectService({ projectId, userId });
 
+    res.json({
+      message: "Single project fetched",
+      data: project,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // UPDATE PROJECT
 export const updateProjectController = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+    const userId = res.locals.userId;
+    const data = req.body;
 
-    try{
-        const{projectId} = req.params;
-        const userId = res.locals.userId;
-        const data = req.body;
+    const project = await updateProjectService({ projectId, userId, data });
 
-        const project = await updateProjectService({projectId, userId, data});
-
-        res.status(200).json({
-            message: "project updated successfully",
-            data: project
-        })
-    } catch(error){
-        next(error)
-    }
-}
+    res.status(200).json({
+      message: "project updated successfully",
+      data: project,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
 
 // DELETE PROJECT
 export const deleteProjectController = async (req, res, next) => {
+  try {
+    const { projectId } = req.params;
+    const userId = res.locals.userId;
+    // const data = req.body;
 
-    try{
-        const{projectId} = req.params;
-        const userId = res.locals.userId;
-        // const data = req.body;
+    const project = await deleteProjectService({ projectId, userId });
 
-        const project = await deleteProjectService({projectId, userId});
-
-        res.json({
-            message: "project deleted successfully",
-            // data: project
-        })
-        } catch(error){
-        next(error)
-        }
-
-    }
+    res.json({
+      message: "project deleted successfully",
+      // data: project
+    });
+  } catch (error) {
+    next(error);
+  }
+};

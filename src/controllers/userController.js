@@ -4,7 +4,7 @@ import {
   refreshAccessTokenService,
   registerUserService,
   resetPasswordService,
-} from "../services/user-service.js";
+} from "../services/userService.js";
 
 // Register User
 export const registerUserController = async (req, res, next) => {
@@ -46,7 +46,7 @@ export const loginUserController = async (req, res, next) => {
     }
 
     //
-    const result = await loginUserService({email, password});
+    const result = await loginUserService({ email, password });
 
     res.json({
       message: "Login successful",

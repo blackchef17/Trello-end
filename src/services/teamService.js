@@ -1,7 +1,7 @@
 import Team from "../models/teamModel.js";
 import crypto from "crypto";
 import { sendInviteEmail } from "./email-service.js";
-import { ROLES } from "../constants/role-constants.js";
+import { ROLES } from "../constants/roleConstants.js";
 
 //CREATE NEW TEAM
 export const createTeamServices = async ({ name, description, ownerId }) => {
@@ -29,8 +29,11 @@ export const getMyTeamServices = async (userId) => {
 };
 
 // ADD MEMBERS TO TEAM
-export const addTeamMemberToTeamService = async (teamId, requesterId, userId) => {
-
+export const addTeamMemberToTeamService = async (
+  teamId,
+  requesterId,
+  userId,
+) => {
   const team = await Team.findById(teamId);
 
   if (!team) {
@@ -38,25 +41,25 @@ export const addTeamMemberToTeamService = async (teamId, requesterId, userId) =>
   }
 
   console.log("Requester ID:", requesterId);
-console.log(
-  "Team Members:",
-  team.members.map(m => ({
-    user: m.user.toString(),
-    role: m.role
-  }))
-);
+  console.log(
+    "Team Members:",
+    team.members.map((m) => ({
+      user: m.user.toString(),
+      role: m.role,
+    })),
+  );
 
-   // Find the requester inside the team
- const requester = team.members.find(
-  (m) => String(m.user) === String(requesterId)
-);
+  // Find the requester inside the team
+  const requester = team.members.find(
+    (m) => String(m.user) === String(requesterId),
+  );
 
   // Ensure requester is part of the team
-  if(!requester) {
-    throw new Error("Not a team member")
+  if (!requester) {
+    throw new Error("Not a team member");
   }
 
-   // Enforce role-based permission (middleware logic)
+  // Enforce role-based permission (middleware logic)
   if (![ROLES.ADMIN, ROLES.MANAGER].includes(requester.role)) {
     throw new Error("Access denied");
   }
@@ -72,7 +75,7 @@ console.log(
 
   team.members.push({
     user: userId,
-    role: ROLES.MEMBER
+    role: ROLES.MEMBER,
   });
 
   await team.save();

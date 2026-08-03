@@ -1,101 +1,85 @@
 // CREATE PROJECT
-import Project from "../models/projectSchema.js"
-import { ROLES } from "../constants/role-constants.js";
+import Project from "../models/projectSchema.js";
+import { ROLES } from "../constants/roleConstants.js";
 import { checkTeamPermission } from "../utils/teamPermission.js";
 
+export const createProjectService = async ({ name, teamId, userId }) => {
+  // Check Permission
+  await checkTeamPermission(teamId, userId, [ROLES.ADMIN, ROLES.MANAGER]);
 
-export const createProjectService = async ({name, teamId, userId}) => {
+  // Check if the project exist in the same team
+  const existingProject = await Project.findOne({
+    name: name.trim(),
+    team: teamId,
+  });
 
-    // Check Permission
-    await checkTeamPermission(teamId, userId, [ROLES.ADMIN, ROLES.MANAGER]);
+  console.log("TEAM ID RECEIVED:", teamId);
+  console.log("USER ID RECEIVED:", userId);
+  if (existingProject) {
+    throw new Error("Project with this name already exist");
+  }
 
-    // Check if the project exist in the same team
-    const existingProject = await Project.findOne({
-        name: name.trim(),
-        team: teamId
-    })
-
-    console.log("TEAM ID RECEIVED:", teamId);
-    console.log("USER ID RECEIVED:",  userId);
-    if(existingProject) {
-        throw new Error ("Project with this name already exist")
-    }
-
-
-    return await Project.create({
-        name: name.trim(),
-        team: teamId,
-        createdBy: userId
-    });
+  return await Project.create({
+    name: name.trim(),
+    team: teamId,
+    createdBy: userId,
+  });
 };
-
 
 // GET ALL PROJECT
-export const getProjectService = async ({teamId, userId}) => {
+export const getProjectService = async ({ teamId, userId }) => {
+  if (teamId) {
+    await checkTeamPermission(teamId, userId);
 
-    if(teamId) {
+    return Project.find({ team: teamId });
+  }
 
-        await checkTeamPermission(teamId, userId);
-
-        return Project.find({team: teamId})
-    }
-    
-    return Project.find({createdBy: userId})
+  return Project.find({ createdBy: userId });
 };
-
 
 // GET SINGLE PROJECT
-export const getSingleProjectService = async ({projectId, userId}) => {
+export const getSingleProjectService = async ({ projectId, userId }) => {
+  const project = await checkProjectPermission(projectId);
 
-    const project = await checkProjectPermission(projectId)
+  await checkTeamPermission(project.team, userId);
 
-    await checkTeamPermission(project.team, userId);
-
-    return project;
+  return project;
 };
-
 
 // UPDATE PROJECT
-export const updateProjectService = async ({projectId, userId, data}) => {
+export const updateProjectService = async ({ projectId, userId, data }) => {
+  const project = await checkProjectPermission(projectId);
 
-    const project = await checkProjectPermission(projectId)
+  await checkTeamPermission(project.team, userId, [ROLES.ADMIN, ROLES.MANAGER]);
 
-    await checkTeamPermission(project.team, userId, [ROLES.ADMIN, ROLES.MANAGER])
+  Object.assign(project, data);
 
-    Object.assign(project, data)
+  await project.save();
 
-    await project.save()
-
-    return project;
-
+  return project;
 };
 
-
 // DELETE PROJECT
-export const deleteProjectService = async ({projectId, userId}) => {
+export const deleteProjectService = async ({ projectId, userId }) => {
+  const project = await checkProjectPermission(projectId);
 
-    const project = await checkProjectPermission(projectId)
+  await checkTeamPermission(project.team, userId, [ROLES.ADMIN]);
 
-    await checkTeamPermission(project.team, userId, [ROLES.ADMIN])
+  await project.deleteOne();
 
-    await project.deleteOne()
-
-    return project;
-}
-
+  return project;
+};
 
 // Validation
 export const checkProjectPermission = async (projectId) => {
+  // Find project ID
+  const project = await Project.findById(projectId);
 
-    // Find project ID
-     const project = await Project.findById(projectId)
-    
-     // if project does not exist
-     if(!project){
-            throw new Error ("Project not found")
-     }
+  // if project does not exist
+  if (!project) {
+    throw new Error("Project not found");
+  }
 
-     // return task
-     return project;
-    
-}
+  // return task
+  return project;
+};
