@@ -1,6 +1,6 @@
 import Team from "../models/teamModel.js";
 import crypto from "crypto";
-import { sendInviteEmail } from "./email-service.js";
+import { sendInviteEmail } from "./emailService.js";
 import { ROLES } from "../constants/roleConstants.js";
 
 //CREATE NEW TEAM
