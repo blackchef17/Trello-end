@@ -74,7 +74,7 @@ export const addMemberToTeamController = async (req, res, next) => {
       newUserId,
     );
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Member added successfully",
       status: 1,
       data: result,
@@ -99,7 +99,7 @@ export const updateMemberRoleController = async (req, res, next) => {
 
     const result = await updateMemberRoleService(ownerId, teamId, userId, role);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Role updated successfully",
       status: 1,
       data: result,
@@ -123,7 +123,7 @@ export const inviteUserController = async (req, res, next) => {
 
     const result = await inviteUserToTeamService(teamId, email);
 
-    res.json({
+    return res.json({
       message: "Invite sent",
       status: 1,
       data: result,

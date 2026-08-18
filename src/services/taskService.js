@@ -1,7 +1,7 @@
 import Project from "../models/projectSchema.js";
 import Task from "../models/taskSchema.js";
 import { ROLES } from "../constants/roleConstants.js";
-import { checkTeamPermission } from "../utils/teamPermission.js";
+import { checkTeamPermission } from "./projectService.js";
 import { checkProjectPermission } from "./projectService.js";
 
 // CREATE TASKS
@@ -22,7 +22,7 @@ export const createTaskService = async ({ title, projectId, userId }) => {
 // GET ALL TASK
 export const getTaskService = async (filter) => {
   // Create filters object
-  const { userId, projectId, taskId, status, priority, projectOwner } = filter;
+  const { userId, projectId, taskId, status, priority, createdBy } = filter;
 
   let query = {};
 
@@ -44,9 +44,9 @@ export const getTaskService = async (filter) => {
     query.priority = priority;
   }
 
-  if (projectOwner) {
-    ownedProject = await Project.find({ owner: projectOwner }).select("_id");
-    ownedProjectIds = ownedProject.map((project) => project._id);
+  if (createdBy) {
+    const ownedProject = await Project.find({ createdBy }).select("_id");
+    const ownedProjectIds = ownedProject.map((project) => project._id);
     query.projectId = { $in: ownedProjectIds };
   }
 
@@ -56,14 +56,14 @@ export const getTaskService = async (filter) => {
     tasks = await Task.find(query);
   } else {
     tasks = await Task.find(query).populate({
-      path: "projectId",
+      path: "projectDetails",
       populate: {
-        path: "team",
+        path: "teamDetails",
         match: { "members.user": userId },
       },
     });
 
-    tasks = tasks.filter((task) => task.projectId?.team);
+    tasks = tasks.filter((task) => task.project?.team);
   }
 
   // find tasks using filters
@@ -94,14 +94,30 @@ export const getSingleTaskService = async (taskId, userId = null) => {
 };
 
 // UPDATE TASK
-export const updateTaskService = async ({ taskId, userId, data }) => {
+export const updateTaskService = async ({
+  taskId,
+  userId,
+  title,
+  description,
+  status,
+  priority,
+  assignedTo,
+  dueDate,
+}) => {
   const task = await checkTaskPermission(taskId);
 
   const taskProject = await Project.findById(task.projectId);
 
   await checkTeamPermission(taskProject.team, userId);
 
-  Object.assign(task, data);
+  Object.assign(task, {
+    title,
+    description,
+    status,
+    priority,
+    assignedTo,
+    dueDate,
+  });
 
   await task.save();
 

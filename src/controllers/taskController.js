@@ -15,7 +15,7 @@ export const createTaskController = async (req, res, next) => {
 
     const task = await createTaskService({ title, projectId, userId });
 
-    res.status(201).json({
+    return res.status(201).json({
       meassage: "Task Created",
       data: task,
     });
@@ -33,11 +33,11 @@ export const getTaskController = async (req, res, next) => {
     // GET filters from query
     const { projectId, status, priority } = req.query;
 
-    console.log("Get Tasks ? ProjectID: " + projectId);
+    // console.log("Get Tasks ? ProjectID: " + projectId);
 
     const tasks = await getTaskService({ projectId, userId, status, priority });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Tasks fetched",
       data: tasks,
     });
@@ -54,7 +54,7 @@ export const getSingleTaskController = async (req, res, next) => {
 
     const task = await getSingleTaskService(taskId, userId);
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Tasks fetched",
       data: task,
     });
@@ -68,11 +68,21 @@ export const updateTaskController = async (req, res, next) => {
   try {
     const { taskId } = req.params;
     const userId = res.locals.userId;
-    const data = req.body;
+    const { title, description, status, priority, assignedTo, dueDate } =
+      req.body;
 
-    const task = await updateTaskService({ taskId, userId, data });
+    const task = await updateTaskService({
+      taskId,
+      userId,
+      title,
+      description,
+      status,
+      priority,
+      assignedTo,
+      dueDate,
+    });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "Tasks updated successfully",
       data: task,
     });
@@ -89,7 +99,7 @@ export const deleteTaskController = async (req, res, next) => {
 
     const taskResult = await deleteTaskService(taskId, userId);
 
-    res.json(result);
+    return res.json(result);
   } catch (error) {
     next(error);
   }
@@ -110,7 +120,7 @@ export const assignTaskController = async (req, res, next) => {
       userId,
     });
 
-    res.json({
+    return res.json({
       message: "Task assigned successfully",
       data: task,
     });

@@ -15,7 +15,7 @@ export const createProjectController = async (req, res, next) => {
 
     const project = await createProjectService({ name, teamId, userId });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "Project Created",
       data: project,
     });
@@ -32,7 +32,7 @@ export const getProjectController = async (req, res, next) => {
 
     const projects = await getProjectService({ teamId, userId });
 
-    res.json({
+    return res.json({
       message: "All Project Fetched",
       data: projects,
     });
@@ -51,7 +51,7 @@ export const getSingleProjectController = async (req, res, next) => {
 
     const project = await getSingleProjectService({ projectId, userId });
 
-    res.json({
+    return res.json({
       message: "Single project fetched",
       data: project,
     });
@@ -65,11 +65,17 @@ export const updateProjectController = async (req, res, next) => {
   try {
     const { projectId } = req.params;
     const userId = res.locals.userId;
-    const data = req.body;
+    const { name, description, status } = req.body;
 
-    const project = await updateProjectService({ projectId, userId, data });
+    const project = await updateProjectService({
+      projectId,
+      userId,
+      name,
+      description,
+      status,
+    });
 
-    res.status(200).json({
+    return res.status(200).json({
       message: "project updated successfully",
       data: project,
     });
@@ -83,13 +89,11 @@ export const deleteProjectController = async (req, res, next) => {
   try {
     const { projectId } = req.params;
     const userId = res.locals.userId;
-    // const data = req.body;
 
     const project = await deleteProjectService({ projectId, userId });
 
-    res.json({
+    return res.json({
       message: "project deleted successfully",
-      // data: project
     });
   } catch (error) {
     next(error);

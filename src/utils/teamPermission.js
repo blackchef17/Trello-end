@@ -1,26 +1,26 @@
-import { ROLES } from "../constants/roleConstants.js";
-import Team from "../models/teamModel.js";
+// import { ROLES } from "../constants/roleConstants.js";
+// import Team from "../models/teamModel.js";
 
-export const checkTeamPermission = async (
-  teamId,
-  userId,
-  allowedRoles = [],
-) => {
-  const team = await Team.findById(teamId);
+// export const checkTeamPermission = async (
+//   teamId,
+//   userId,
+//   allowedRoles = [],
+// ) => {
+//   const team = await Team.findById(teamId);
 
-  if (!team) {
-    throw new Error("Team is not found");
-  }
+//   if (!team) {
+//     throw new Error("Team is not found");
+//   }
 
-  const member = team.members.find((m) => m.user.toString() === userId);
+//   const member = team.members.find((m) => m.user.toString() === userId);
 
-  if (!member) {
-    throw new Error("Not a member");
-  }
+//   if (!member) {
+//     throw new Error("Not a member");
+//   }
 
-  if (allowedRoles.length > 0 && !allowedRoles.includes(member.role)) {
-    throw new Error("Access denied");
-  }
+//   if (allowedRoles.length > 0 && !allowedRoles.includes(member.role)) {
+//     throw new Error("Access denied");
+//   }
 
-  return { team, member };
-};
+//   return { team, member };
+// };

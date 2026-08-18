@@ -22,7 +22,7 @@ export const registerUserController = async (req, res, next) => {
 
     const output = await registerUserService({ username, email, password });
 
-    res.status(201).json({
+    return res.status(201).json({
       message: "user registered successfully. Please login",
       status: 1,
       data: output,
@@ -48,7 +48,7 @@ export const loginUserController = async (req, res, next) => {
     //
     const result = await loginUserService({ email, password });
 
-    res.json({
+    return res.json({
       message: "Login successful",
       status: 1,
       data: result,
@@ -98,7 +98,7 @@ export const resetPassword = async (req, res, next) => {
 
     const result = await resetPasswordService(token, newPassword);
 
-    res.json({
+    return res.json({
       message: "Reset Password Successful",
       status: 1,
       data: result,
@@ -118,7 +118,7 @@ export const refreshAccessToken = async (req, res, next) => {
     }
     const result = await refreshAccessTokenService(refreshToken);
 
-    res.json({
+    return res.json({
       message: "Refresh Token successful",
       status: 1,
       data: result,
