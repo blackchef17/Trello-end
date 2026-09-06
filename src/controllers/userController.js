@@ -73,7 +73,7 @@ export const forgotPassword = async (req, res, next) => {
 
     const result = await forgotPasswordService(email);
 
-    res.json({
+    return res.json({
       message: "Forgot Password",
       status: 1,
       data: result,

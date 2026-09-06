@@ -59,7 +59,13 @@ export const updateProjectService = async ({
 
   await checkTeamPermission(project.team, userId, [ROLES.ADMIN, ROLES.MANAGER]);
 
-  Object.assign(project, { name, description, status });
+  const updates = {};
+
+  if (name !== undefined) updates.name = name;
+  if (description !== undefined) updates.description = description;
+  if (status !== status) updates.status = status;
+
+  Object.assign(project, updates);
 
   await project.save();
 

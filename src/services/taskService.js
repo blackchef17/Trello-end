@@ -110,14 +110,16 @@ export const updateTaskService = async ({
 
   await checkTeamPermission(taskProject.team, userId);
 
-  Object.assign(task, {
-    title,
-    description,
-    status,
-    priority,
-    assignedTo,
-    dueDate,
-  });
+  const updates = {};
+
+  if (title !== undefined) updates.title = title;
+  if (description !== undefined) updates.description = description;
+  if (status !== undefined) updates.status = status;
+  if (priority !== undefined) updates.priority = priority;
+  if (assignedTo !== undefined) updates.assignedTo = assignedTo;
+  if (dueDate !== undefined) updates.assignedTo = dueDate;
+
+  Object.assign(task, updates);
 
   await task.save();
 
