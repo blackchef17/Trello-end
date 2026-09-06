@@ -1,17 +1,16 @@
 import express from "express";
-import { createTaskController, getTaskController, getSingleTaskController, updateTaskController, deleteTaskController } from "../controllers/taskController.js";
-import { assignTaskController } from "../controllers/assignTaskController.js";
+import { createTaskController, getTaskController, getSingleTaskController, updateTaskController, deleteTaskController, assignTaskController } from "../controllers/taskController.js";
 
 const taskRoutes = express.Router();
 
 // POST Create task
-taskRoutes.post("/:projectId", createTaskController);
+taskRoutes.post("/", createTaskController);
 
 // GET all task
-taskRoutes.get("/:projectId", getTaskController)
+taskRoutes.get("/", getTaskController)
 
 // GET all single task
-taskRoutes.get("/single/:taskId", getSingleTaskController)
+taskRoutes.get("/:taskId", getSingleTaskController)
 
 // UPDATE all task
 taskRoutes.patch("/:taskId", updateTaskController)

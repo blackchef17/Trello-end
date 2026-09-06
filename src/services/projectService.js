@@ -1,78 +1,123 @@
 // CREATE PROJECT
-import Project from "../models/projectSchema.js"
-import { ROLES } from "../constants/role-constants.js";
-import { checkTeamPermission } from "../utils/teamPermission.js";
-import { checkProjectPermission } from "../utils/projectPermission.js";
+import Project from "../models/projectSchema.js";
+import { ROLES } from "../constants/roleConstants.js";
+// import { checkTeamPermission } from "../utils/teamPermission.js";
+import Team from "../models/teamModel.js";
 
+export const createProjectService = async ({ name, teamId, userId }) => {
+  // Check Permission
+  await checkTeamPermission(teamId, userId, [ROLES.ADMIN, ROLES.MANAGER]);
 
-export const createProjectService = async ({name, teamId, userId}) => {
+  // Check if the project exist in the same team
+  const existingProject = await Project.findOne({
+    name: name.trim(),
+    team: teamId,
+  });
 
-    // Check Permission
-    await checkTeamPermission(teamId, userId, [ROLES.ADMIN, ROLES.MANAGER]);
+  console.log("TEAM ID RECEIVED:", teamId);
+  console.log("USER ID RECEIVED:", userId);
+  if (existingProject) {
+    throw new Error("Project with this name already exist");
+  }
 
-    // Check if the project exist in the same team
-    const existingProject = await Project.findOne({
-        name: name.trim(),
-        team: teamId
-    })
-
-    if(existingProject) {
-        throw new Error ("Project with this name already exist")
-    }
-
-
-    return await Project.create({
-        name: name.trim(),
-        team: teamId,
-        createdBy: userId
-    });
+  return await Project.create({
+    name: name.trim(),
+    team: teamId,
+    createdBy: userId,
+  });
 };
-
 
 // GET ALL PROJECT
-export const getProjectService = async ({teamId, userId}) => {
-
+export const getProjectService = async ({ teamId, userId }) => {
+  if (teamId) {
     await checkTeamPermission(teamId, userId);
 
-    return project.find({team: teamId})
-};
+    return Project.find({ team: teamId });
+  }
 
+  return Project.find({ createdBy: userId });
+};
 
 // GET SINGLE PROJECT
-export const getSingleProjectService = async ({projectId, userId}) => {
+export const getSingleProjectService = async ({ projectId, userId }) => {
+  const project = await checkProjectPermission(projectId);
 
-    const project = await checkProjectPermission(projectId)
+  await checkTeamPermission(project.team, userId);
 
-    await checkTeamPermission(project.team, userId);
-
-    return project;
+  return project;
 };
-
 
 // UPDATE PROJECT
-export const updateProjectService = async ({projectId, userId, data}) => {
+export const updateProjectService = async ({
+  projectId,
+  userId,
+  name,
+  description,
+  status,
+}) => {
+  const project = await checkProjectPermission(projectId);
 
-    const project = await checkProjectPermission(projectId)
+  await checkTeamPermission(project.team, userId, [ROLES.ADMIN, ROLES.MANAGER]);
 
-    await checkTeamPermission(project.team, userId, [ROLES.ADMIN, ROLES.MANAGER])
+  const updates = {};
 
-    Object.assign(project, data)
+  if (name !== undefined) updates.name = name;
+  if (description !== undefined) updates.description = description;
+  if (status !== status) updates.status = status;
 
-    await project.save()
+  Object.assign(project, updates);
 
-    return project;
+  await project.save();
 
+  return project;
 };
 
-
 // DELETE PROJECT
-export const deleteProjectService = async ({projectId, userId}) => {
+export const deleteProjectService = async ({ projectId, userId }) => {
+  const project = await checkProjectPermission(projectId);
 
-    const project = await checkProjectPermission(projectId)
+  await checkTeamPermission(project.team, userId, [ROLES.ADMIN]);
 
-    await checkTeamPermission(project.team, userId, [ROLES.ADMIN])
+  await project.deleteOne();
 
-    await project.deleteOne()
+  return project;
+};
 
-    return project;
-}
+// Project Validation
+export const checkProjectPermission = async (projectId) => {
+  // Find project ID
+  const project = await Project.findById(projectId);
+
+  // if project does not exist
+  if (!project) {
+    throw new Error("Project not found");
+  }
+
+  // return task
+  return project;
+};
+
+// Team Validation
+export const checkTeamPermission = async (
+  teamId,
+  userId,
+  allowedRoles = [],
+) => {
+  const team = await Team.findById(teamId);
+
+  if (!team) {
+    throw new Error("Team is not found");
+  }
+
+  const member = team.members.find((m) => m.user.toString() === userId);
+
+  if (!member) {
+    throw new Error("Not a member");
+  }
+
+  if (allowedRoles.length > 0 && !allowedRoles.includes(member.role)) {
+    throw new Error("Access denied");
+  }
+
+  return { team, member };
+};

@@ -1,44 +1,42 @@
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 dotenv.config();
 
-import express from 'express';
+import express from "express";
 const app = express();
 
-import morgan from 'morgan';
-import './src/db/config.js';
+import morgan from "morgan";
+import "./src/db/config.js";
 
 import apiRoutes from "./src/routes/index.js";
 
-
 const PORT = process.env.PORT || 3000;
-
 
 //Middleware
 app.use(express.json());
 
 //Morgan Logging Middleware
-app.use(morgan('dev'))
+app.use(morgan("dev"));
 
 // Register user routes
 app.use("/api", apiRoutes);
 
 //Normal routes
-app.get('/', (req, res) => {
-  res.send('Everything is okay');
+app.get("/", (req, res) => {
+  res.send("Everything is okay");
 });
 
 //Route that makes an error
-app.get('/error', (req, res, next) => {
-    const error = new Error("something is broken in your code");
-    next(error); // sends the error to the handler
+app.get("/error", (req, res, next) => {
+  const error = new Error("something is broken in your code");
+  next(error); // sends the error to the handler
 });
 
 // (centralized error handler)
 // MUST be at the bottom
 app.use((err, req, res, next) => {
-    res.status(500).send(err.message)
-})
-
+  console.error(err);
+  res.status(500).send(err.message);
+});
 
 //Starting the server
 app.listen(PORT, () => {
