@@ -1,7 +1,7 @@
 import User from "../models/userschema.js";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { sendPasswordResetEmail } from "./email-service.js";
+import { sendPasswordResetEmail } from "./emailService.js";
 import {
   generateAccessToken,
   generateRefreshToken,
@@ -42,13 +42,12 @@ export const registerUserService = async (userData) => {
 
 //LOGIN SPACE
 export const loginUserService = async ({ email, password }) => {
-
   console.log("Incoming email:", email);
 
   //Find user by email
   const user = await User.findOne({ email });
 
-   console.log("Found user:", user);
+  console.log("Found user:", user);
 
   if (!user) {
     throw new Error("Invalid credential");
@@ -63,7 +62,6 @@ export const loginUserService = async ({ email, password }) => {
 
   const accessToken = generateAccessToken({ id: user._id });
   const refreshToken = generateRefreshToken({ id: user._id });
-
 
   //Return tokens and user info
   return {

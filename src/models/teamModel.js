@@ -1,37 +1,39 @@
 import mongoose from "mongoose";
-import { ROLES } from "../constants/role-constants.js";
+import { ROLES } from "../constants/roleConstants.js";
 
-const teamSchema = new mongoose.Schema({
+const teamSchema = new mongoose.Schema(
+  {
     name: {
-        type: String,
-        required: true,
-        trim: true
+      type: String,
+      required: true,
+      trim: true,
     },
 
     description: {
-        type: String
+      type: String,
     },
 
     owner: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User",
-        required: true
-    }, 
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
 
     members: [
-        {
-    user: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User"
-    },
-    role: {
-        type: String,
-        enum: [ROLES.ADMIN, ROLES.MANAGER, ROLES.MEMBER],
-        default: "member"
-    }
-}
-]
-},
- {timestamps: true});
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+        },
+        role: {
+          type: String,
+          enum: [ROLES.ADMIN, ROLES.MANAGER, ROLES.MEMBER],
+          default: "member",
+        },
+      },
+    ],
+  },
+  { timestamps: true },
+);
 
-export default mongoose.model("Team", teamSchema)
+export default mongoose.model("Team", teamSchema);

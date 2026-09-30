@@ -1,29 +1,35 @@
 import express from "express";
 import { authenticate } from "../middlewares/authMiddleware.js";
-import { createProjectController, getProjectController, getSingleProjectController, updateProjectController, deleteProjectController } from "../controllers/projectController.js";
+import {
+  createProjectController,
+  getProjectController,
+  getSingleProjectController,
+  updateProjectController,
+  deleteProjectController,
+} from "../controllers/projectController.js";
 import taskRoutes from "./taskRoutes.js";
 
 const projectRoutes = express.Router();
 
 //Protect all project route
-projectRoutes.use(authenticate)
+projectRoutes.use(authenticate);
+
+//GET GET ALL TASKS USING THE PROJECT
+projectRoutes.use("/tasks", taskRoutes);
 
 //POST CREATE PROJECT
-projectRoutes.post("/:teamId", createProjectController);
-
+projectRoutes.post("/", createProjectController);
 
 //GET GET ALL PROJECT
-projectRoutes.get("/:teamId", getProjectController)
+projectRoutes.get("/", getProjectController);
 
 // GET single project
-projectRoutes.get("/single/:projectId", getSingleProjectController)
+projectRoutes.get("/:projectId", getSingleProjectController);
 
 // UPDATE project
-projectRoutes.patch("/:projectId", updateProjectController)
+projectRoutes.patch("/:projectId", updateProjectController);
 
 // DELETE project
-projectRoutes.delete("/:projectId", deleteProjectController)
-
-projectRoutes.use("/tasks", taskRoutes)
+projectRoutes.delete("/:projectId", deleteProjectController);
 
 export default projectRoutes;
