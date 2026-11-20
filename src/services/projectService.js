@@ -28,14 +28,34 @@ export const createProjectService = async ({ name, teamId, userId }) => {
 };
 
 // GET ALL PROJECT
-export const getProjectService = async ({ teamId, userId }) => {
+export const getProjectService = async ({
+  sort,
+  page,
+  limit,
+  teamId,
+  userId,
+}) => {
   if (teamId) {
     await checkTeamPermission(teamId, userId);
 
-    return Project.find({ team: teamId });
+    const currentPage = Number(page) || 1;
+    const itemsPerPage = Number(limit) || 10;
+    const skip = (currentPage - 1) * itemsPerPage;
+
+    if (teamId) {
+      await checkTeamPermission(teamId, userId);
+
+      return Project.find({ team: teamId })
+        .sort(sort || "-createdAt")
+        .skip(skip)
+        .limit(itemsPerPage);
+    }
   }
 
-  return Project.find({ createdBy: userId });
+  return Project.find({ createdBy: userId })
+    .sort(sort || "-createdAt")
+    .skip(skip)
+    .limit(itemsPerPage);
 };
 
 // GET SINGLE PROJECT

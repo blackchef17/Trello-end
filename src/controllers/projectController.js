@@ -27,10 +27,17 @@ export const createProjectController = async (req, res, next) => {
 // GET ALL PROJECT
 export const getProjectController = async (req, res, next) => {
   try {
+    const { sort, page, limit } = req.query;
     const { teamId } = req.params;
     const userId = res.locals.userId;
 
-    const projects = await getProjectService({ teamId, userId });
+    const projects = await getProjectService({
+      sort,
+      page,
+      limit,
+      teamId,
+      userId,
+    });
 
     return res.json({
       message: "All Project Fetched",
